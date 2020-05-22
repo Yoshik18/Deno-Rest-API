@@ -1,3 +1,4 @@
+import { v4 } from "https://deno.land/std/uuid/mod.ts";
 import { Product } from "../types.ts";
 
 let products: Product[] = [
@@ -30,34 +31,96 @@ const getProducts = ({ response }: { response: any }) => {
 };
 
 // @route  GET /api/v1/product/:id
-const getProduct = ({ response }: { response: any }) => {
-  response.body = {
-    success: true,
-    data: products,
-  };
+const getProduct = (
+  { params, response }: { params: { id: string }; response: any },
+) => {
+  const product: Product | undefined = products.find((p) => p.id === params.id);
+  if (product) {
+    response.status = 200;
+    response.body = {
+      success: true,
+      data: product,
+    };
+  } else {
+    response.status = 404;
+    response.body = {
+      success: false,
+      msg: "No Product Found",
+    };
+  }
 };
 
 // @route  POST /api/v1/products
-const addProduct = ({ response }: { response: any }) => {
-  response.body = {
-    success: true,
-    data: products,
-  };
+const addProduct = async (
+  { request, response }: { request: any; response: any },
+) => {
+  //No longer in global async scope in function
+  const body = await request.body();
+
+  if (!request.hasBody) {
+    response.status = 400,
+      response.body = {
+        status: false,
+        body: "No data",
+      };
+  } else {
+    const product: Product = body.value;
+    product.id = v4.generate();
+    products.push(product);
+    response.status = 201;
+    response.body = {
+      success: true,
+      data: product,
+    };
+  }
 };
 
 // @route  PUT /api/v1/products/:id
-const updateProduct = ({ response }: { response: any }) => {
-  response.body = {
-    success: true,
-    data: products,
-  };
+const updateProduct = async (
+  { params, request, response }: {
+    params: { id: string };
+    request: any;
+    response: any;
+  },
+) => {
+  const product: Product | undefined = products.find((p) => p.id === params.id);
+  if (product) {
+    const body = await request.body();
+
+    const updateData: {
+      name?: string;
+      description?: string;
+      price?: number;
+    } = body.value;
+
+    products = products.map((p) =>
+      p.id === params.id ? { ...p, ...updateData } : p
+    );
+    response.status = 200;
+    response.body = {
+      success: true,
+      data: products,
+    };
+  } else {
+    response.status = 404;
+    response.body = {
+      success: false,
+      msg: "No Product Found",
+    };
+  }
 };
 
 // @route  DELETE /api/v1/products/:id
-const deleteProduct = ({ response }: { response: any }) => {
+const deleteProduct = (
+  { params, response }: { params: { id: string }; response: any },
+) => {
+  products = products.filter((p) => p.id !== params.id);
+
+  response.status = 200;
   response.body = {
     success: true,
-    data: products,
+    msg: "Product Removed",
+    body: products,
   };
 };
 export { getProducts, addProduct, getProduct, updateProduct, deleteProduct };
