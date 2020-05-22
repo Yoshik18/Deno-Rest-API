@@ -20,3 +20,44 @@ let products: Product[] = [
     price: 59.99,
   },
 ];
+
+// @route  GET /api/v1/products
+const getProducts = ({ response }: { response: any }) => {
+  response.body = {
+    success: true,
+    data: products,
+  };
+};
+
+// @route  GET /api/v1/product/:id
+const getProduct = ({ response }: { response: any }) => {
+  response.body = {
+    success: true,
+    data: products,
+  };
+};
+
+// @route  POST /api/v1/products
+const addProduct = ({ response }: { response: any }) => {
+  response.body = {
+    success: true,
+    data: products,
+  };
+};
+
+// @route  PUT /api/v1/products/:id
+const updateProduct = ({ response }: { response: any }) => {
+  response.body = {
+    success: true,
+    data: products,
+  };
+};
+
+// @route  DELETE /api/v1/products/:id
+const deleteProduct = ({ response }: { response: any }) => {
+  response.body = {
+    success: true,
+    data: products,
+  };
+};
+export { getProducts, addProduct, getProduct, updateProduct, deleteProduct };
